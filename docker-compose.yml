@@ -51,6 +51,25 @@ services:
     volumes:
       - ./.tmp/database-training-data:/var/lib/postgresql/data/
     environment:
-      POSTGRES_USER: unicorn_user
-      POSTGRES_PASSWORD: magical_password
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: training
+
+  conduktor-platform:
+    image: conduktor/conduktor-platform:1.15.0
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./conduktor_data:/var/conduktor
+      - type: bind
+        source: "./platform-config.yaml"
+        target: /opt/conduktor/platform-config.yaml
+        read_only: true
+    depends_on:
+      - kafka1
+    environment:
+      CDK_IN_CONF_FILE: /opt/conduktor/platform-config.yaml
+      KAFKA_BOOTSTRAP_SERVER: "kafka1:19092"
+      ORGANIZATION_NAME: "sample"
+      ADMIN_EMAIL: "sample@email.org"
+      ADMIN_PSW: "admin"
